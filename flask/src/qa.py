@@ -216,18 +216,24 @@ def load_vectors(word_bank_len):
 
 # 可能近义词处理
 def proc_synonym(word):
-    word = list(word)
-    words = []
-    flag = False
-    for w in word:
-        for ww in word_bank:
-            if w in ww:
-                words.append(ww)
-                flag = True
+    def metch_Knum(w):
+        return word in w
+    temp_list = list(filter(metch_Knum, word_bank))
+    if (len(temp_list) == 0):
+        word = list(word)
+        words = []
+        flag = False
+        for w in word:
+            for ww in word_bank:
+                if w in ww:
+                    words.append(ww)
+                    flag = True
+                    break
+            if flag:
                 break
-        if flag:
-            break
-    return words
+        return words
+    else:
+        return temp_list
 def loadWordVec():
     pass
 
