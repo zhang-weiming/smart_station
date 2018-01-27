@@ -6,6 +6,7 @@ import math
 import pymysql
 import json
 import random
+import Levenshtein
 
 NEW_LINE = '\n'
 
@@ -38,7 +39,12 @@ place_dict = {
     '寄存处':'#11', 
     '商店':'#12', 
     '厕所':'#13', 
-    '开水':'#14'
+    '开水':'#14',
+    '手机充电站': '#15',
+    '行李托运': '#16',
+    '临时证件': '#17',
+    '失物招领': '#18',
+    '售改退': '#19'
 }
 
 # 求一个向量的模长
@@ -89,6 +95,16 @@ def ask_place(segment):
             ans_dict = dict()
             ans_dict['question'] = key
             ans_dict['answer'] = place_dict[key]
+            ans_str = json.dumps(ans_dict, ensure_ascii=False)
+            return True, ans_str
+    for s in segment:
+        def metch_place(p):
+            return s in p
+        temp_list = list(filter(metch_place, place_dict))
+        if len(temp_list) != 0:
+            ans_dict = dict()
+            ans_dict['question'] = temp_list[0]
+            ans_dict['answer'] = place_dict[temp_list[0]]
             ans_str = json.dumps(ans_dict, ensure_ascii=False)
             return True, ans_str
     return False, ''
@@ -216,24 +232,35 @@ def load_vectors(word_bank_len):
 
 # 可能近义词处理
 def proc_synonym(word):
-    def metch_Knum(w):
-        return word in w
-    temp_list = list(filter(metch_Knum, word_bank))
-    if (len(temp_list) == 0):
-        word = list(word)
-        words = []
-        flag = False
-        for w in word:
-            for ww in word_bank:
-                if w in ww:
-                    words.append(ww)
-                    flag = True
-                    break
-            if flag:
-                break
-        return words
-    else:
-        return temp_list
+    # def cut(w):
+    #     return list(w)
+    # word_list_bank = map(cut, word_bank)
+    # word = list(word)
+    score_list = [0 for i in range(len(word_bank))]
+    for i, w in enumerate(word_bank):
+        score_list[i] = Levenshtein.ratio(word, w)
+    # print(score_list)
+    words = list()
+    words.append( word_bank[score_list.index(max(score_list))] )
+    return words
+    # def metch_Knum(w):
+    #     return word in w
+    # temp_list = list(filter(metch_Knum, word_bank))
+    # if (len(temp_list) == 0):
+    #     word = list(word)
+    #     words = []
+    #     flag = False
+    #     for w in word:
+    #         for ww in word_bank:
+    #             if w in ww:
+    #                 words.append(ww)
+    #                 flag = True
+    #                 break
+    #         if flag:
+    #             break
+    #     return words
+    # else:
+    #     return temp_list
 def loadWordVec():
     pass
 
