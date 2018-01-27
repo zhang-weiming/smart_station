@@ -40,7 +40,7 @@ place_dict = {
     '商店':'#12', 
     '厕所':'#13', 
     '开水':'#14',
-    '手机充电站': '#15',
+    '手机充电': '#15', # 手机充电站
     '行李托运': '#16',
     '临时证件': '#17',
     '失物招领': '#18',
@@ -117,6 +117,8 @@ def answer(question):
     # pynlpir.close()
     jieba.load_userdict(USER_DICT_FILE_PATH)
     segment = jieba.lcut(question, cut_all=True)
+    while '' in segment:
+        segment.remove('')
     print('[segment]', segment)
     is_place, place = ask_place(segment)
     if is_place:
